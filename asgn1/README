@@ -20,4 +20,4 @@ Run the lexer using following commands:
 
 – cd asgn1
 – make
-– bin/lexer test/test1.c
+– bin/lexer test/test1.go
