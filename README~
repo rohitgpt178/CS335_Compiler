@@ -1,0 +1,18 @@
+A lexer for Go lang
+
+This lexer is implemented for the following tuple
+Source Language : GOLANG
+Implementation Language : C++
+Target Language: MIPS
+
+Firstly we wrote lexer.l which specifies the tokens along with their regular expressions.
+Then we composed scanner.h which gives token number to each particular token.
+Command 'flex lexer.l' produces lex.yy.c 
+Then we wrote scanner.cpp to generate lexemes.
+Then lex.yy.c file is used with scanner.cpp file to generate executable lexer, which is then executed with .go program as its argument to generate required output.
+
+Run the lexer using following commands:
+
+– cd asgn1
+– make
+– bin/lexer test/test1.c

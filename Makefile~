@@ -1,0 +1,3 @@
+all:
+	flex src/lexer.l
+	g++ src/scanner.cpp src/lex.yy.c -o bin/lexer
