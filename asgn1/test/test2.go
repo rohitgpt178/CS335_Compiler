@@ -1,94 +1,43 @@
+// Go supports <em><a href="http://en.wikipedia.org/wiki/Pointer_(computer_programming)">pointers</a></em>,
+// allowing you to pass references to values and records
+// within your program.
+
 package main
 
-import (
-	"flag"
-	"fmt"
-	"log"
-	"os"
-	"sort"
-	"strconv"
-	"strings"
+import "fmt"
 
-	"github.com/schachmat/ingo"
-	_ "github.com/schachmat/wego/backends"
-	_ "github.com/schachmat/wego/frontends"
-	"github.com/schachmat/wego/iface"
-)
+// We'll show how pointers work in contrast to values with
+// 2 functions: `zeroval` and `zeroptr`. `zeroval` has an
+// `int` parameter, so arguments will be passed to it by
+// value. `zeroval` will get a copy of `ival` distinct
+// from the one in the calling function.
+func zeroval(ival int) {
+    ival = 0
+}
 
-func pluginLists() {
-	bEnds := make([]string, 0, len(iface.AllBackends))
-	for name := range iface.AllBackends {
-		bEnds = append(bEnds, name)
-	}
-	sort.Strings(bEnds)
-
-	fEnds := make([]string, 0, len(iface.AllFrontends))
-	for name := range iface.AllFrontends {
-		fEnds = append(fEnds, name)
-	}
-	sort.Strings(fEnds)
-
-	fmt.Fprintln(os.Stderr, "Available backends:", strings.Join(bEnds, ", "))
-	fmt.Fprintln(os.Stderr, "Available frontends:", strings.Join(fEnds, ", "))
+// `zeroptr` in contrast has an `*int` parameter, meaning
+// that it takes an `int` pointer. The `*iptr` code in the
+// function body then _dereferences_ the pointer from its
+// memory address to the current value at that address.
+// Assigning a value to a dereferenced pointer changes the
+// value at the referenced address.
+func zeroptr(iptr *int) {
+    *iptr = 0
 }
 
 func main() {
-	// initialize backends and frontends (flags and default config)
-	for _, be := range iface.AllBackends {
-		be.Setup()
-	}
-	for _, fe := range iface.AllFrontends {
-		fe.Setup()
-	}
+    i := 1
+    fmt.Println("initial:", i)
 
-	// initialize global flags and default config
-	location := flag.String("location", "40.748,-73.985", "`LOCATION` to be queried")
-	flag.StringVar(location, "l", "40.748,-73.985", "`LOCATION` to be queried (shorthand)")
-	numdays := flag.Int("days", 3, "`NUMBER` of days of weather forecast to be displayed")
-	flag.IntVar(numdays, "d", 3, "`NUMBER` of days of weather forecast to be displayed (shorthand)")
-	unitSystem := flag.String("units", "metric", "`UNITSYSTEM` to use for output.\n    \tChoices are: metric, imperial, si")
-	flag.StringVar(unitSystem, "u", "metric", "`UNITSYSTEM` to use for output. (shorthand)\n    \tChoices are: metric, imperial, si")
-	selectedBackend := flag.String("backend", "forecast.io", "`BACKEND` to be used")
-	flag.StringVar(selectedBackend, "b", "forecast.io", "`BACKEND` to be used (shorthand)")
-	selectedFrontend := flag.String("frontend", "ascii-art-table", "`FRONTEND` to be used")
-	flag.StringVar(selectedFrontend, "f", "ascii-art-table", "`FRONTEND` to be used (shorthand)")
+    zeroval(i)
+    fmt.Println("zeroval:", i)
 
-	// print out a list of all backends and frontends in the usage
-	tmpUsage := flag.Usage
+    // The `&i` syntax gives the memory address of `i`,
+    // i.e. a pointer to `i`.
+    zeroptr(&i)
+    fmt.Println("zeroptr:", i)
 
-	// read/write config and parse flags
-	if err := ingo.Parse("wego"); err != nil {
-		log.Fatalf("Error parsing config: %v", err)
-	}
-
-	// non-flag shortcut arguments overwrite possible flag arguments
-	for _, arg := range flag.Args() {
-		if v, err := strconv.Atoi(arg); err == nil && len(arg) == 1 {
-			*numdays = v
-		} else {
-			*location = arg
-		}
-	}
-
-	// get selected backend and fetch the weather data from it
-	be, ok := iface.AllBackends[*selectedBackend]
-	if !ok {
-		log.Fatalf("Could not find selected backend \"%s\"", *selectedBackend)
-	}
-	r := be.Fetch(*location, *numdays)
-
-	// set unit system
-	unit := iface.UnitsMetric
-	if *unitSystem == "imperial" {
-		unit = iface.UnitsImperial
-	} else if *unitSystem == "si" {
-		unit = iface.UnitsSi
-	}
-
-	// get selected frontend and render the weather data with it
-	fe, ok := iface.AllFrontends[*selectedFrontend]
-	if !ok {
-		log.Fatalf("Could not find selected frontend \"%s\"", *selectedFrontend)
-	}
-	fe.Render(r, unit)
+    // Pointers can be printed too.
+    fmt.Println("pointer:", &i)
 }
+
