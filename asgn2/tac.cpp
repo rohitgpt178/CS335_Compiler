@@ -1,15 +1,19 @@
 #include<bits/stdc++.h>
+#include "tac.h"
 using namespace std;
 
+vector <tac> prog;		//the whole ir code
+	
+vector <int> leaders;		//block leaders if i is in leaders then prog[i] = leader
 //include symtab.h
 //make a header for irstruct as well
 
 
-class tac{			//program will be scanned into a list(or map etc.) of objects of this class
+/*class tac{			//program will be scanned into a list(or map etc.) of objects of this class
 	
 	public:
 	int lineno = 1;
-	/*InstrType*/ string type = "";		//maybe define as enum type or mapping to types
+	string type = "";		//maybe define as enum type or mapping to types
 	
 	string in1 = "";				//SymTabEntry *in1;
 	string in2 = "";				//SymTabEntry *in2;
@@ -22,24 +26,10 @@ class tac{			//program will be scanned into a list(or map etc.) of objects of th
 		cout << "line = " << lineno << " type = " << type << " in1 = " << in1 << " in2 = " << in2 << " out = " << out << " target = " << target << " op = " << op << endl; 
 	}
 					//methods should be public
-	/*void init_ir(string x,int y){	//this method will be called for each 3addr instruction
-		type = x;
-		target = y;
-	}
-	
-	string getType(){
-		return type;
-	}
-	
-	int getTarget(){
-		return target;
-	}*/
-};
+};*/
 
 int main(int argc, char **argv){
-	vector <tac> prog;		//the whole ir code
-	
-	vector <int> leaders;		//block leaders if i is in leaders then prog[i] = leader
+
 	leaders.push_back(1);
 	
 	string line;
@@ -77,9 +67,9 @@ int main(int argc, char **argv){
 				else if(token=="goto"){
 					ins_temp.type = "goto";
 				}
-				else if(token=="param"){
+				/*else if(token=="param"){
 					ins_temp.type = "param";
-				}
+				}*/
 				else if(token=="call"){
 					ins_temp.type = "call";
 				}
@@ -116,9 +106,9 @@ int main(int argc, char **argv){
 				else if(ins_temp.type == "goto"){
 					if(i==3)ins_temp.target = stoi(token);
 				}
-				else if(ins_temp.type == "param"){
+				/*else if(ins_temp.type == "param"){
 					if(i==3)ins_temp.in1 = token;
-				}
+				}*/
 				else if(ins_temp.type == "call"){
 					if(i==3)ins_temp.in1 = token;
 					if(i==4)ins_temp.in2 = token;
