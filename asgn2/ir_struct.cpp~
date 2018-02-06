@@ -1,0 +1,87 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+//include symtab.h
+//make a header for irstruct as well
+
+
+class tac{			//program will be scanned into a list(or map etc.) of objects of this class
+	
+	public:
+	int lineno;
+	/*InstrType*/ string type;		//maybe define as enum type or mapping to types
+	
+	//SymTabEntry *in1;
+	//SymTabEntry *in2;
+	//SymTabEntry *out;		
+		
+	int target;
+	//Operator op;			//maybe define as enum type
+	
+					//methods should be public
+	void init_ir(string x,int y){	//this method will be called for each 3addr instruction
+		type = x;
+		target = y;
+	}
+	
+	string getType(){
+		return type;
+	}
+	
+	int getTarget(){
+		return target;
+	}
+};
+
+int main(int argc, char **argv){
+	vector <tac> prog;		//the whole ir code
+	tac ins1;
+	
+	vector <int> leaders;		//block leaders if i is in leaders then prog[i] = leader
+	
+	//ins1.type = 1;
+	//ins1.target = 5;
+	ins1.init_ir("goto",4);
+	//prog.push_back(ins1);
+	//cout << prog[0].getType() << endl;
+	//cout << prog[0].getTarget() << endl;
+	
+	string line;
+	//string delim = ", ";
+	ifstream mycode(argv[1]);
+	//mycode.open(argv[1]);
+	//mycode.ignore(' ');
+	
+	while(getline(mycode,line)){
+		cout << line << endl;
+		//cout << typeid(line).name() << endl;
+		//line.ignore(' ');
+		istringstream str(line);
+		//cout << "-------------" << endl;
+		string token;
+		int i = 1;
+		tac ins_temp;
+		while(getline(str,token,',')){
+			cout << token << '\t' << typeid(token).name() << '\n';
+			
+			if(i==1){			//getting line no.
+				ins_temp.lineno = stoi(token);
+			}
+			else{				//type if instr	
+			
+				if(token=="="){ins_temp.type = "assign";printf("= is HERE");}
+				//else if(token=="")
+			}
+			i++;
+		}
+		prog.push_back(ins_temp);
+		//printf("\n");		
+	}
+	
+	string asd = "123";
+	int asd1 = stoi(asd);
+	cout << "asd1 = " << asd1 << endl;
+	
+	
+	return 0;
+}
