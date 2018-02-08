@@ -1,0 +1,2 @@
+g++ -c global.cpp
+g++ -o final global.o global_user.o

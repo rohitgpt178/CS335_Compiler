@@ -1,5 +1,5 @@
 #include<bits/stdc++.h>
-#include "symtab.h"
+//#include "symtab.h"
 //#include "tac.h"
 using namespace std;
 
@@ -10,11 +10,9 @@ using namespace std;
 		string addr_desc = "";	 
 }details;*/
 
-
-int main(){
+/*int main(){
 	
 	unordered_map <string*,details*> symtab;				//this denotes one sym table
-	
 	//testing
 	string * var1_name = new string();
 	*var1_name = "x";
@@ -37,14 +35,9 @@ int main(){
      	
      	vector <tac> prog;				//suppose it contains all the instructions
      	
-     	cout << prog.size() << endl;
-     	
+     	//cout << prog.size() << endl;
+     	print_prog();
      	//main code to be contd.
      	//next use implementation
-     	
-     	
-     		
-     	
-     	
-	return 0;
-}
+      	return 0;
+}*/
