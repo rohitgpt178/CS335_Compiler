@@ -1,3 +1,0 @@
-all:
-	g++ -std=c++11 ir_struct.cpp -o ir_struct
-	./ir_struct test.ir
