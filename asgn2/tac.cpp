@@ -13,11 +13,19 @@ vector <int> end_block;
 
 vector < vector <tuple <string,bool,int> > > updates;	//updates[i][0,1,or 2] gives one of 3 updates on symtab
 
+unordered_map<string, details*>:: iterator itr;
+unordered_map<string, string>:: iterator itr2;
+//unordered_map <string,details*> symtab[n_block];
+
 unordered_map <string,string> addrdesc;			//done
-unordered_map <string,string> regdesc;			
+unordered_map <string,string> regdesc;	
+unordered_map <int,int> line_block;
+vector < unordered_map <string,details*>> symtab;		//this denotes entire symtable 		
+list <string> emptyreg = {"$t1,$t2"};
 
+int label_ret = 0;
 
-void enter_variables(unordered_map <string,details*> symtab[]){		//fills variables in sym_tabs
+void enter_variables(vector < unordered_map <string,details*>> &symtab){		//fills variables in sym_tabs
 	//cout << n_lines << '\t' << n_block << endl;
 	for(int i=0;i<n_block;i++){				//symtab[i] denotes ith (0 to n_block-1) block's symtable 
 		/*int start_block = leaders[i];
@@ -75,7 +83,7 @@ void fill_nextuse( unordered_map <string,details*> symtab,int start_block,int en
 			updates[i-1].push_back(make_tuple(out_1,symtab[out_1]->status,symtab[out_1]->nextuse));
 			//updating
 			symtab[out_1]->status = false;
-			symtab[out_1]->nextuse = 0;
+			symtab[out_1]->nextuse = INT_MAX;
 		}
 		if(in_1!="" && isInteger(in_1)!=1){
 			updates[i-1].push_back(make_tuple(in_1,symtab[in_1]->status,symtab[in_1]->nextuse));
@@ -90,7 +98,13 @@ void fill_nextuse( unordered_map <string,details*> symtab,int start_block,int en
 	}
 }
 
-void print_symtab(unordered_map <string,details*> symtab[],int n_block){				//prints symbol_table
+void print_prog(){
+	for(int i=0;i<prog.size();i++){
+		prog[i].get_details();
+	}
+}
+
+void print_symtab(vector < unordered_map <string,details*>> &symtab,int n_block){				//prints symbol_table
 	for(int i=0;i<n_block;i++){
 		cout << "----------Block " << i << "---------------" << endl;
 		for (itr = symtab[i].begin(); itr != symtab[i].end(); itr++)
@@ -100,7 +114,7 @@ void print_symtab(unordered_map <string,details*> symtab[],int n_block){				//pr
      	}
 }
 
-void fill_addrdesc(unordered_map <string,details*> symtab[],int n_block){
+void fill_addrdesc(vector < unordered_map <string,details*>> &symtab,int n_block){
 	for(int i=0;i<n_block;i++){
 		for (itr = symtab[i].begin(); itr != symtab[i].end(); itr++)
 		    	{
@@ -131,16 +145,53 @@ void setregister(string reg_name,string var_name){
 	regdesc[reg_name] = var_name;
 }
 
-/*string getreg(tac instr){			returns register for tac.out
+bool check_reg(string str){
+	//checks whether str is a register or not 
+	if(str[0]=='$')return true;	//for now
+	else return false;
+}
+
+string getReg(string var,tac instr,vector < unordered_map <string,details*>> &symtab){			//returns register for tac.out
 	//x = y op z
-	string y = instr.in1;	//y
+	/*string y = instr.in1;	//y
 	string z = instr.in2;	//z
 	string x = instr.out;	//x
+	int block_no = line_block[instr.lineno];
 	
-	if(){
-	
+	if(var==x){
+		if(isInteger(y)==0 && check_reg(getlocation(y))==true && symtab[block_no][y]->nextuse==0 ){
+			//y is in a register
+			return addrdesc[y];
+			//update everything for variable y
+		}
+		else if(emptyreg.size()>0){
+			string reg = emptyreg.front();
+			emptyreg.pop_front();
+			return reg;
+		}
+		else if(symtab[block_no][x]->nextuse!=INT_MAX){
+			int max_nextuse = 0;
+			string var_maxnextuse = "";
+			for(itr = symtab[block_no].begin(); itr != symtab[block_no].end(); itr++){
+				if(itr->second->nextuse >= max_nextuse){
+					max_nextuse = itr->second->nextuse;
+					var_maxnextuse = itr->first;
+				}
+			}
+			//store var_maxnextuse to "mem" & return its reg
+		
+			return addrdesc[var_maxnextuse];
+			//update everything for variable var_maxnextuse;
+		}
+		else{
+			return "mem";
+		}	
 	}
-}*/
+	/*else{
+	
+	}*/
+	return "$t0";
+}
 
 int main(int argc, char **argv){
 
@@ -173,7 +224,7 @@ int main(int argc, char **argv){
 				}	
 				else if(token=="+"||token=="-"||token=="*"||token=="/"||token=="%"){	//x = y op z check for x = op y
 					ins_temp.type = "assign2";
-					ins_temp.op = "token";
+					ins_temp.op = token;
 				}//add more operators
 				else if(token=="ifgoto"){
 					ins_temp.type = "ifgoto";
@@ -262,8 +313,25 @@ int main(int argc, char **argv){
 	}
 	end_block.push_back(n_lines);
 	
+	//filling mapping between lines to blocks
+	for(int i=0;i<n_block;i++){
+		for(int j=start_block[i];j<=end_block[i];j++){
+			line_block.insert(make_pair(j,i));
+		}
+	}
+	
+	//<testing>
+	cout << "-----------program------------\n";
+	print_prog();
+	//for(int i=1;i<=n_lines;i++){
+	//	cout << line_block[i] << endl;
+	//}
+	//</testing>
+	
 	//symbol table
-	unordered_map <string,details*> symtab[n_block];		//this denotes entire symtable 
+	//unordered_map <string,details*> symtab[n_block];		//this denotes entire symtable 
+	symtab.resize(n_block);
+	
 	/*
 	//<testing>
 	string var1_name = "x";
@@ -297,8 +365,11 @@ int main(int argc, char **argv){
      	if(symtab[1].find(key_temp)==symtab[1].end()){
      		cout << "a is here!" << endl;
      	}*/
+     	cout << "SYMTAB" << endl;
      	print_symtab(symtab,n_block);
+     	cout << "addrdesc" << endl;
      	print_addrdesc();
+     	//cout << symtab[1]["b"]->status << endl;
      	//</testing>
      	
      	updates.resize(n_lines);
@@ -320,18 +391,30 @@ int main(int argc, char **argv){
      	}
      	
      	//<testing>
-     	//print_symtab(symtab,n_block);
-     	/*cout << "-----------------------" << endl;
+     	print_symtab(symtab,n_block);
+     	cout << "-----------------------" << endl;
      	
      	cout << "-----------------------" << endl;
      	for(int j=0;j<updates.size();j++){
 	     	for(int i=0;i<updates[j].size();i++){
 	     		cout << j+1 << " : " <<get<0>(updates[j][i]) << '\t' << get<1>(updates[j][i]) << '\t' << get<2>(updates[j][i]) << endl;
 	     	}
-     	}*/
+     	}
      	//</testing>
 	
-	
+	cout << "----------------CODEGEN__---------------\n";
+	string blockcode = "";
+	//prog[0].get
+	codegen(prog[0],blockcode);
+	codegen(prog[1],blockcode);
+	codegen(prog[2],blockcode);
+	codegen(prog[3],blockcode);
+	codegen(prog[4],blockcode);
+	codegen(prog[5],blockcode);
+	codegen(prog[6],blockcode);
+	codegen(prog[7],blockcode);
+	codegen(prog[8],blockcode);
+	cout << blockcode;
 	
 	
 	return 0;

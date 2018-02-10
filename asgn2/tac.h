@@ -1,5 +1,6 @@
 #include<bits/stdc++.h>
 #include "symtab.h"
+//#include "codegen.h"
 using namespace std;
 
 class tac{			//program will be scanned into a list(or map etc.) of objects of this class
@@ -28,47 +29,50 @@ extern vector <int> end_block;
 
 extern vector < vector <tuple <string,bool,int> > > updates;	//updates[i][0,1,or 2] gives one of 3 updates on symtab i = lineno
 
-void print_prog(){
-	for(int i=0;i<prog.size();i++){
-		prog[i].get_details();
-	}
-}
-
-void print_leaders(){
+void print_prog();
+/*void print_leaders(){
 	for(int i=0;i<leaders.size();i++){
 		cout << leaders[i] << '\t';
 	}
 	printf("\n");
-}
+}*/
 
-void enter_variables(unordered_map <string,details*> symtab[]);
+void enter_variables(vector < unordered_map <string,details*>> &symtab);
 
-void print_symtab(unordered_map <string,details*> symtab[],int n_block);
+void print_symtab(vector < unordered_map <string,details*>> &symtab,int n_block);
 
-void fill_addrdesc(unordered_map <string,details*> symtab[],int n_block);
+void fill_addrdesc(vector < unordered_map <string,details*>> &symtab,int n_block);
 
 void print_addrdesc();
 
-string get_location(string var_name);
+//used in code gen
+
+string getlocation(string var_name);
 
 void setlocation(string var_name,string reg_name);
 
 void setregister(string reg_name,string var_name);
 
-string getreg(tac);		//getreg function
+string getReg(string var, tac instr,vector < unordered_map <string,details*>> &symtab);		//getreg function
 
+bool check_reg(string str);
+
+extern int label_ret;
+
+//code gen function
+void codegen(tac instr,string &blockcode);
 
 //additional functions
 
-bool isInteger(string s)
-{
+bool isInteger(string s);
+/*{
    if(s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false ;
 
    char * p ;
    strtol(s.c_str(), &p, 10) ;
 
    return (*p == 0) ;
-}
+}*/
 
 
 
