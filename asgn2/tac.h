@@ -27,7 +27,7 @@ extern int n_block;
 extern vector <int> start_block;
 extern vector <int> end_block;
 
-extern vector < vector <tuple <string,bool,int> > > updates;	//updates[i][0,1,or 2] gives one of 3 updates on symtab i = lineno
+extern vector < vector <tuple <string,bool,int> > > updates;	//updates[i][0,1,or 2] gives one of 3 updates on symtab i = lineno+1
 
 void print_prog();
 /*void print_leaders(){
@@ -54,6 +54,8 @@ void setlocation(string var_name,string reg_name);
 void setregister(string reg_name,string var_name);
 
 string getReg(string var, tac instr,vector < unordered_map <string,details*>> &symtab);		//getreg function
+
+void update_symtab(vector < unordered_map <string,details*>> &symtab,vector < vector <tuple <string,bool,int> > > updates,int lineno);
 
 bool check_reg(string str);
 

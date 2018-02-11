@@ -21,9 +21,11 @@ unordered_map <string,string> addrdesc;			//done
 unordered_map <string,string> regdesc;	
 unordered_map <int,int> line_block;
 vector < unordered_map <string,details*>> symtab;		//this denotes entire symtable 		
-list <string> emptyreg = {"$t1,$t2"};
+list <string> emptyreg = {"$a1","$a2","$a3"/*,"$t1","$t2","$t3","$t4","$t5","$t6","$t7","$t8","$t9","$s1","$s2","$s3","$s4","$s5","$s6","$s7"*/};
 
 int label_ret = 0;
+
+string blockcode = "";
 
 void enter_variables(vector < unordered_map <string,details*>> &symtab){		//fills variables in sym_tabs
 	//cout << n_lines << '\t' << n_block << endl;
@@ -98,6 +100,22 @@ void fill_nextuse( unordered_map <string,details*> symtab,int start_block,int en
 	}
 }
 
+void update_symtab(vector < unordered_map <string,details*>> &symtab,vector < vector <tuple <string,bool,int> > > updates,int lineno){
+	//we have to update updates[lineno-1] symtab[i] where i = block no. of line no. lineno
+	int block_no = line_block[lineno];	//update symtab[block_no]
+	//cout << "updating symtab at line : " << lineno << endl;
+	for(int i=0;i<updates[lineno-1].size();i++){
+		string var = get<0>(updates[lineno-1][i]);
+		bool status_new = get<1>(updates[lineno-1][i]);
+		int nextuse_new = get<2>(updates[lineno-1][i]);
+		
+		//updating symtab
+		symtab[block_no][var]->status = status_new;
+		symtab[block_no][var]->nextuse = nextuse_new; 
+	}
+	
+}
+
 void print_prog(){
 	for(int i=0;i<prog.size();i++){
 		prog[i].get_details();
@@ -120,7 +138,7 @@ void fill_addrdesc(vector < unordered_map <string,details*>> &symtab,int n_block
 		    	{
 				if(addrdesc.find(itr->first)==addrdesc.end()){
 					addrdesc.insert(make_pair(itr->first,"mem"));
-					cout << "inserted " << itr->first << endl;
+					//cout << "inserted " << itr->first << endl;
 				}	
 		     	}
 	}
@@ -153,44 +171,78 @@ bool check_reg(string str){
 
 string getReg(string var,tac instr,vector < unordered_map <string,details*>> &symtab){			//returns register for tac.out
 	//x = y op z
-	/*string y = instr.in1;	//y
+	string reg;
+	string y = instr.in1;	//y
 	string z = instr.in2;	//z
 	string x = instr.out;	//x
 	int block_no = line_block[instr.lineno];
-	
+	//cout << "GETTING rg for " << var << endl;
 	if(var==x){
-		if(isInteger(y)==0 && check_reg(getlocation(y))==true && symtab[block_no][y]->nextuse==0 ){
+		if(isInteger(y)==0 && check_reg(getlocation(y))==true /*&& symtab[block_no][y]->status==false*/ && symtab[block_no][y]->nextuse==INT_MAX ){
 			//y is in a register
-			return addrdesc[y];
+			reg = getlocation(y);
+			blockcode = blockcode + "sw\t" + reg + ", " + y + "\n";
 			//update everything for variable y
+			addrdesc[y] = "mem";
+			
 		}
 		else if(emptyreg.size()>0){
-			string reg = emptyreg.front();
+			reg = emptyreg.front();
 			emptyreg.pop_front();
-			return reg;
+			//return reg;
 		}
-		else if(symtab[block_no][x]->nextuse!=INT_MAX){
+		else/* if(symtab[block_no][x]->nextuse!=INT_MAX)*/{
 			int max_nextuse = 0;
 			string var_maxnextuse = "";
 			for(itr = symtab[block_no].begin(); itr != symtab[block_no].end(); itr++){
-				if(itr->second->nextuse >= max_nextuse){
-					max_nextuse = itr->second->nextuse;
-					var_maxnextuse = itr->first;
+				if(check_reg(addrdesc[itr->first])==true){
+					if(itr->second->nextuse >= max_nextuse){
+						max_nextuse = itr->second->nextuse;
+						var_maxnextuse = itr->first;
+					}
 				}
 			}
 			//store var_maxnextuse to "mem" & return its reg
-		
-			return addrdesc[var_maxnextuse];
-			//update everything for variable var_maxnextuse;
-		}
-		else{
-			return "mem";
-		}	
-	}
-	/*else{
 	
-	}*/
-	return "$t0";
+			reg = getlocation(var_maxnextuse);
+			//update everything for variable var_maxnextuse;
+			blockcode = blockcode + "sw\t" + reg + ", " + var_maxnextuse + "\n";
+			addrdesc[var_maxnextuse] = "mem";
+			//return reg;
+		}
+		/*else{
+			return "mem";
+		}*/
+	}
+		
+	else{						//requires register for y or z
+		if(emptyreg.size()>0){
+			reg = emptyreg.front();
+			emptyreg.pop_front();
+			//return reg;
+		}
+		else/* if(symtab[block_no][var]->nextuse!=INT_MAX)*/{	//var has next use in the block
+			int max_nextuse = 0;
+			string var_maxnextuse = "";
+			for(itr = symtab[block_no].begin(); itr != symtab[block_no].end(); itr++){
+				if(check_reg(addrdesc[itr->first])==true){
+					if(itr->second->nextuse >= max_nextuse){
+						max_nextuse = itr->second->nextuse;
+						var_maxnextuse = itr->first;
+					}
+				}
+			}
+			//store var_maxnextuse to "mem" & return its reg
+	
+			reg = getlocation(var_maxnextuse);
+			//update everything for variable var_maxnextuse;
+			blockcode = blockcode + "sw\t" + reg + ", " + var_maxnextuse + "\n";
+			addrdesc[var_maxnextuse] = "mem";
+		}
+	}
+	//cout << "GOT rg for " << var << "---------" << reg << endl;
+	
+	return reg;
 }
 
 int main(int argc, char **argv){
@@ -222,7 +274,7 @@ int main(int argc, char **argv){
 				if(token=="="){
 					ins_temp.type = "assign1";					//handles x = 3, x = y[i] , x = *y
 				}	
-				else if(token=="+"||token=="-"||token=="*"||token=="/"||token=="%"){	//x = y op z check for x = op y
+				else if(token=="+"||token=="-"||token=="*"||token=="/"||token=="&"||token=="|"||token=="^"||token=="%"){	//x = y op z check for x = op y
 					ins_temp.type = "assign2";
 					ins_temp.op = token;
 				}//add more operators
@@ -241,7 +293,7 @@ int main(int argc, char **argv){
 				else if(token=="label"){
 					ins_temp.type = "label";
 				}
-				else if(token=="ret"){
+				else if(token=="ret"){					//name it exit
 					ins_temp.type = "return1";					//no further tokens
 				}
 				else if(token=="return"){
@@ -275,13 +327,13 @@ int main(int argc, char **argv){
 					if(i==3)ins_temp.in1 = token;
 				}*/
 				else if(ins_temp.type == "call"){
-					if(i==3)ins_temp.in1 = token;
+					if(i==3)ins_temp.op = token;
 					//if(i==4)ins_temp.in2 = token;
 				}
 				else if(ins_temp.type == "label"){
-					if(i==3)ins_temp.in1 = token;
+					if(i==3)ins_temp.op = token;
 				}
-				else if(ins_temp.type == "return"){
+				else if(ins_temp.type == "return2"){
 					if(i==3)ins_temp.in1 = token;
 				}
 				else if(ins_temp.type == "print"){
@@ -295,7 +347,7 @@ int main(int argc, char **argv){
 			//printf("HERE\n");
 			is_prev = 0;
 		}
-		if(ins_temp.type == "ifgoto" || ins_temp.type == "goto"){
+		if(ins_temp.type == "ifgoto" || ins_temp.type == "goto"){			//checl for label is block or not??
 			leaders.push_back(ins_temp.target);
 			//printf("HERE\n");
 			is_prev = 1;
@@ -321,8 +373,8 @@ int main(int argc, char **argv){
 	}
 	
 	//<testing>
-	cout << "-----------program------------\n";
-	print_prog();
+	//cout << "-----------program------------\n";
+	//print_prog();
 	//for(int i=1;i<=n_lines;i++){
 	//	cout << line_block[i] << endl;
 	//}
@@ -365,10 +417,10 @@ int main(int argc, char **argv){
      	if(symtab[1].find(key_temp)==symtab[1].end()){
      		cout << "a is here!" << endl;
      	}*/
-     	cout << "SYMTAB" << endl;
-     	print_symtab(symtab,n_block);
-     	cout << "addrdesc" << endl;
-     	print_addrdesc();
+     	//cout << "SYMTAB" << endl;
+     	//print_symtab(symtab,n_block);
+     	//cout << "addrdesc" << endl;
+     	//print_addrdesc();
      	//cout << symtab[1]["b"]->status << endl;
      	//</testing>
      	
@@ -378,10 +430,11 @@ int main(int argc, char **argv){
      	}*/
      	
      	//<testing>
-     	/*updates[0].push_back(make_tuple("a",true,5));
-     	for(int i=0;i<updates[0].size();i++){
-     		cout << get<0>(updates[0][i]) << '\t' << get<1>(updates[0][i]) << '\t' << get<2>(updates[0][i]) << endl;
-     	}*/
+     	//updates[0].push_back(make_tuple("a",true,5));
+     	//cout << "---------updates-------------\n";
+     	//for(int i=0;i<updates[0].size();i++){
+     	//	cout << get<0>(updates[0][i]) << '\t' << get<1>(updates[0][i]) << '\t' << get<2>(updates[0][i]) << endl;
+     	//}
      	//cout << symtab[0]["a"]->status << " should be 0 \n";
      	//</testing>
      	
@@ -391,20 +444,19 @@ int main(int argc, char **argv){
      	}
      	
      	//<testing>
-     	print_symtab(symtab,n_block);
-     	cout << "-----------------------" << endl;
+     	//print_symtab(symtab,n_block);
+     	//cout << "-----------------------" << endl;
      	
-     	cout << "-----------------------" << endl;
+     	/*cout << "-----------updates------------" << endl;
      	for(int j=0;j<updates.size();j++){
 	     	for(int i=0;i<updates[j].size();i++){
-	     		cout << j+1 << " : " <<get<0>(updates[j][i]) << '\t' << get<1>(updates[j][i]) << '\t' << get<2>(updates[j][i]) << endl;
+	     		cout << j+1 << " : " << get<0>(updates[j][i]) << '\t' << get<1>(updates[j][i]) << '\t' << get<2>(updates[j][i]) << endl;
 	     	}
-     	}
+     	}*/
      	//</testing>
 	
-	cout << "----------------CODEGEN__---------------\n";
-	string blockcode = "";
-	//prog[0].get
+	//cout << "----------------CODEGEN---------------\n";
+	/*//prog[0].get
 	codegen(prog[0],blockcode);
 	codegen(prog[1],blockcode);
 	codegen(prog[2],blockcode);
@@ -414,8 +466,38 @@ int main(int argc, char **argv){
 	codegen(prog[6],blockcode);
 	codegen(prog[7],blockcode);
 	codegen(prog[8],blockcode);
-	cout << blockcode;
+	cout << blockcode;*/
 	
+	//printing .data
+	cout << ".data\n";
+	for (itr2 = addrdesc.begin(); itr2 != addrdesc.end(); itr2++)
+	{
+		cout << itr2->first << ":\t.word\t0" << endl;
+	}
+	cout << ".text\nmain:\n";
+	//.main
 	
+	for(int i=0;i<n_block;i++){
+		//cout << "CODE FOR BLOCK " << i << "\n";
+		blockcode = "l" + to_string(leaders[i]) + ":\n";
+		for(int index = start_block[i];index<=end_block[i];index++){	//index is lineno -> prog[index-1] is the code
+			update_symtab(symtab,updates,index);
+			codegen(prog[index-1],blockcode);
+		}
+		//todo : store all variables back in memory and update regdesc,addrdesc.
+		cout << blockcode;
+		for (itr2 = addrdesc.begin(); itr2 != addrdesc.end(); itr2++)
+	    	{
+			//cout << itr2->first << "\t" << itr2->second << endl;
+			if(check_reg(itr2->second)==1){
+				string reg_old = itr2->second;
+				string variable = itr2->first;
+				cout << "sw\t" << reg_old << ", " <<  variable << "\n";
+				setlocation(variable,"mem");
+				setregister(reg_old,"");
+				
+			}
+	     	}
+	}
 	return 0;
 }

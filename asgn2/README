@@ -1,0 +1,8 @@
+Translator for Three-address code to mips instructions
+
+Instructions:
+	make
+	./final test.ir
+	
+	make clean		//for deleting objects
+
