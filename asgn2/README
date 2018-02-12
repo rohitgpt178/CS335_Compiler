@@ -1,8 +1,23 @@
-Translator for Three-address code to mips instructions
+CS335: COMPILER DESIGN, 2017-18/II
 
-Instructions:
-	make
-	./final test.ir
-	
-	make clean		//for deleting objects
+GROUP 47
+------------------------------------------------------------
 
+Three Address Code to Assembly Code Generator (Executable on SPIM Simuator)
+
+This Code Generator is implemented for the following tuple: 
+Source Language : GOLANG
+Implementation Language : C++
+Target Language: MIPS
+
+Firstly we wrote tac.cpp which in itself consists of many function like getreg, setlocation, getlocation
+for getting registers and their location when codegen.cpp is being executed. File codegen.cpp contains exact
+commands for SPIM Simulator if that type of instruction is their in input file.
+
+Make generates an executable which takes .ir file as input and produces an assembly code.
+
+Run Code Generator using following commands
+
+– cd asgn2
+– make
+– bin/codegen test/test1.ir

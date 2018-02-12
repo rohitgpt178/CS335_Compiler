@@ -23,6 +23,7 @@ class tac{			//program will be scanned into a list(or map etc.) of objects of th
 
 extern vector <tac> prog;
 extern vector <int> leaders;		//block leaders if i is in leaders then prog[i] = leader
+extern vector <int> label_leaders;
 extern int n_block;
 extern vector <int> start_block;
 extern vector <int> end_block;
@@ -58,6 +59,12 @@ string getReg(string var, tac instr,vector < unordered_map <string,details*>> &s
 void update_symtab(vector < unordered_map <string,details*>> &symtab,vector < vector <tuple <string,bool,int> > > updates,int lineno);
 
 bool check_reg(string str);
+
+bool is_labelleader(int x);
+
+void add_emptyreg(string reg);
+
+void conserve_block();
 
 extern int label_ret;
 

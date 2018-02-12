@@ -1,7 +1,8 @@
 all:
-	g++ -std=c++11 -c codegen.cpp
-	g++ -std=c++11 -c tac.cpp
-	g++ -o final codegen.o tac.o
+	g++ -std=c++11 -c src/translate.cpp
+	g++ -std=c++11 -c src/tac.cpp
+	g++ -o bin/codegen translate.o tac.o
 
 clean:
-	rm *.o	
+	rm *.o
+	rm bin/codegen

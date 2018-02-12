@@ -78,12 +78,12 @@ void codegen(tac instr,string &blockcode){
 		}
 		
 		else if(instr.op=="-"){
-			if(isInteger(reg2)||isInteger(reg3)){
-				blockcode = blockcode + "subi\t" + reg1 + ", " + reg2 + ", " + reg3 + "\n";
-			}
-			else{
+			/*if(isInteger(reg2)||isInteger(reg3)){
 				blockcode = blockcode + "sub\t" + reg1 + ", " + reg2 + ", " + reg3 + "\n";
 			}
+			else{*/
+				blockcode = blockcode + "sub\t" + reg1 + ", " + reg2 + ", " + reg3 + "\n";
+			//}
 		}
 		
 		else if(instr.op=="*"){
@@ -210,10 +210,10 @@ void codegen(tac instr,string &blockcode){
 						blockcode = blockcode+ "ble\t" + loc2 + ", " + instr.in2 + ", " + "l" + to_string(instr.target) + "\n";
 					}else{
 						reg2=getReg(instr.in1, instr, symtab);
-						blockcode = blockcode + "li " + reg2 + ", " + instr.in1 +"\n"; 
+						blockcode = blockcode + "lw\t" + reg2 + ", " + instr.in1 +"\n"; 
 						blockcode = blockcode+ "ble\t" + reg2 + ", " + instr.in2 + ", " + "l" + to_string(instr.target) + "\n";
 						setregister(reg2, instr.in1);
-				        setlocation(instr.in1, reg2);
+				        	setlocation(instr.in1, reg2);
 					}
 					
 				}
@@ -226,7 +226,7 @@ void codegen(tac instr,string &blockcode){
 						blockcode = blockcode+ "bge\t" + loc2 + ", " + instr.in2 + ", " + "l" + to_string(instr.target) + "\n";
 					}else{
 						reg2=getReg(instr.in1, instr, symtab);
-						blockcode = blockcode + "li " + reg2 + ", " + instr.in1 +"\n";
+						blockcode = blockcode + "lw\t" + reg2 + ", " + instr.in1 +"\n";
 						blockcode = blockcode+ "bge\t" + reg2 + ", " + instr.in2 + ", " + "l" + to_string(instr.target) + "\n";
 						setregister(reg2, instr.in1);
 				        setlocation(instr.in1, reg2);
@@ -242,7 +242,7 @@ void codegen(tac instr,string &blockcode){
 						blockcode = blockcode+ "blt\t" + loc2 + ", " + instr.in2 + ", " + "l" + to_string(instr.target)+ "\n";
 					}else{
 						reg2=getReg(instr.in1, instr, symtab);
-						blockcode = blockcode + "li " + reg2 + ", " + instr.in1 +"\n";
+						blockcode = blockcode + "lw\t" + reg2 + ", " + instr.in1 +"\n";
 						blockcode = blockcode+ "blt\t" + reg2 + ", " + instr.in2 + ", " + "l" + to_string(instr.target)+ "\n";
 						setregister(reg2, instr.in1);
 				        setlocation(instr.in1, reg2);
@@ -258,7 +258,7 @@ void codegen(tac instr,string &blockcode){
 						blockcode = blockcode+ "bgt\t" + loc2 + ", " + instr.in2 + ", " + "l" + to_string(instr.target)+ "\n";
 					}else{
 						reg2=getReg(instr.in1, instr, symtab);
-						blockcode = blockcode + "li " + reg2 + ", " + instr.in1 +"\n";
+						blockcode = blockcode + "lw\t" + reg2 + ", " + instr.in1 +"\n";
 						blockcode = blockcode+ "bgt\t" + reg2 + ", " + instr.in2 + ", " + "l" + to_string(instr.target)+ "\n";
 						setregister(reg2, instr.in1);
 				        setlocation(instr.in1, reg2);
@@ -273,7 +273,7 @@ void codegen(tac instr,string &blockcode){
 						blockcode = blockcode+ "beq\t" + loc2 + ", " + instr.in2 + ", " + "l" + to_string(instr.target)+ "\n";
 					}else{
 						reg2=getReg(instr.in1, instr, symtab);
-						blockcode = blockcode + "li " + reg2 + ", " + instr.in1 +"\n";
+						blockcode = blockcode + "lw\t" + reg2 + ", " + instr.in1 +"\n";
 						blockcode = blockcode+ "beq\t" + reg2 + ", " + instr.in2 + ", " + "l" + to_string(instr.target)+ "\n";
 						setregister(reg2, instr.in1);
 				        setlocation(instr.in1, reg2);
@@ -288,7 +288,7 @@ void codegen(tac instr,string &blockcode){
 						blockcode = blockcode+ "bne\t" + loc2 + ", " + instr.in2 + ", " + "l" + to_string(instr.target)+ "\n";
 					}else{
 						reg2=getReg(instr.in1, instr, symtab);
-						blockcode = blockcode + "li " + reg2 + ", " + instr.in1 +"\n";
+						blockcode = blockcode + "lw\t" + reg2 + ", " + instr.in1 +"\n";
 						blockcode = blockcode+ "bne\t" + reg2 + ", " + instr.in2 + ", " + "l" + to_string(instr.target)+ "\n";
 						setregister(reg2, instr.in1);
 				        setlocation(instr.in1, reg2);
@@ -342,36 +342,36 @@ void codegen(tac instr,string &blockcode){
  					reg1=getReg(instr.in1,instr, symtab);	
 
  					if (instr.op=="leq"){
- 						blockcode = blockcode + "li " + reg1 + ", " + instr.in1 +"\n";
+ 						blockcode = blockcode + "lw\t" + reg1 + ", " + instr.in1 +"\n";
  						blockcode = blockcode+ "ble\t" + reg1 + ", " + loc2 + ", " + "l" + to_string(instr.target)+ "\n";
  					}
 
  					if (instr.op=="geq"){
- 						blockcode = blockcode + "li " + reg1 + ", " + instr.in1 +"\n";
+ 						blockcode = blockcode + "lw\t" + reg1 + ", " + instr.in1 +"\n";
  						blockcode = blockcode+ "bge\t" + reg1 + ", " + loc2 + ", " + "l" + to_string(instr.target)+ "\n";
  					}
 
  					if (instr.op=="le"){
 
- 						blockcode = blockcode + "li " + reg1 + ", " + instr.in1 +"\n";
+ 						blockcode = blockcode + "lw\t" + reg1 + ", " + instr.in1 +"\n";
  						blockcode = blockcode+ "blt\t" + reg1 + ", " + loc2 + ", " + "l" + to_string(instr.target)+ "\n";
  					}
 
  					if (instr.op=="ge"){
 
- 						blockcode = blockcode + "li " + reg1 + ", " + instr.in1 +"\n";
+ 						blockcode = blockcode + "lw\t" + reg1 + ", " + instr.in1 +"\n";
  						blockcode = blockcode+ "bgt\t" + reg1 + ", " + loc2 + ", " + "l" + to_string(instr.target)+ "\n";
  					}
 
  					if (instr.op=="eq"){
 
- 						blockcode = blockcode + "li " + reg1 + ", " + instr.in1 +"\n";
+ 						blockcode = blockcode + "lw\t" + reg1 + ", " + instr.in1 +"\n";
  						blockcode = blockcode+ "beq\t" + reg1 + ", " + loc2 + ", " + "l" + to_string(instr.target)+ "\n";
  					}
 
  					if (instr.op=="neq"){
 
- 						blockcode = blockcode + "li " + reg1 + ", " + instr.in1 +"\n";
+ 						blockcode = blockcode + "lw\t" + reg1 + ", " + instr.in1 +"\n";
  						blockcode = blockcode+ "bne\t" + reg1 + ", " + loc2 + ", " + "l" + to_string(instr.target)+ "\n";
  					}
  					
@@ -384,8 +384,8 @@ void codegen(tac instr,string &blockcode){
 					reg1=getReg(instr.in1,instr, symtab);
 					reg2=getReg(instr.in2,instr, symtab);
 
-					blockcode = blockcode + "li " + reg1 + ", " + instr.in1 +"\n";
-					blockcode = blockcode + "li " + reg2 + ", " + instr.in2 +"\n";
+					blockcode = blockcode + "lw\t" + reg1 + ", " + instr.in1 +"\n";
+					blockcode = blockcode + "lw\t" + reg2 + ", " + instr.in2 +"\n";
 
 					if (instr.op=="leq"){
 
@@ -432,7 +432,7 @@ void codegen(tac instr,string &blockcode){
 		label_ret=1;
 		blockcode = blockcode + instr.op + ":\n\t";
 		blockcode = blockcode + "addi\t$sp,$sp,-4\n\t";
-		blockcode = blockcode + "sw\t$t0, 0($sp)\n\t";
+		blockcode = blockcode + "sw\t$t0, 0($sp)\n";
 	}
 	
 	else if(instr.type=="return1"){
@@ -452,24 +452,52 @@ void codegen(tac instr,string &blockcode){
 	else if(instr.type=="return2"){
 
 		if(isInteger(instr.in1)){
-			blockcode = blockcode + "addi \t$v0, $0, "+ instr.in1 + "\nlw \t$t0, 0($sp)\naddi \t$sp,$sp,4\njr \t$ra\n ";
+			blockcode = blockcode + "addi \t$v0, $0, "+ instr.in1 + "\n";
 		}else{
 
 			loc1=getlocation(instr.in1);
 			if(loc1!="mem"){
 
-				blockcode = blockcode + "add \t$v0, $0, " + loc1 + "\nlw \t$t0, 0($sp)\naddi \t$sp,$sp,4\njr \t$ra\n ";
+				blockcode = blockcode + "add \t$v0, $0, " + loc1 + "\n";
 			}else{
 
 				reg1=getReg(instr.in1,instr, symtab);
-				blockcode=blockcode+"lw \t"+reg1+", "+instr.in1 + "\nadd \t$v0, $0, "+reg1+"\nlw \t$t0, 0($sp)\naddi \t$sp,$sp,4\njr\t$ra\n ";
+				setlocation(instr.in1,reg1);
+				setregister(reg1,instr.in1);
+				blockcode=blockcode+"lw \t$v0"+", "+instr.in1 + "\n";
 			}
+		}
+	}
+	//getreturn
+	else if(instr.type=="getreturn"){
+		loc1=getlocation(instr.in1);
+		if(loc1!="mem"){
+			reg1 = loc1;
+			blockcode = blockcode + "move \t" + reg1 + ", $v0" + "\n";
+		}else{
+
+			reg1=getReg(instr.in1,instr, symtab);
+			setlocation(instr.in1,reg1);
+			setregister(reg1,instr.in1);
+			blockcode = blockcode + "move \t" + reg1 + ", $v0" + "\n";
 		}
 	}
 
 	else if(instr.type=="print"){
-
-			blockcode = blockcode + "li $v0, 1\nlw $a0, " + instr.in1 + "\n" + "syscall\n";
+			if(isInteger(instr.in1)){
+				blockcode = blockcode + "li\t$v0, 1\nli\t$a0, " + instr.in1 + "\n" + "syscall\n";	
+			}
+			else{
+				loc1 = getlocation(instr.in1);
+				if(loc1=="mem"){
+					reg1 = getReg(instr.in1,instr, symtab);
+					setlocation(instr.in1,reg1);
+					setregister(reg1,instr.in1);
+					blockcode = blockcode + "lw\t" + reg1 + ", " + instr.in1 + "\n";
+				}
+				else reg1 = loc1;
+				blockcode = blockcode + "li\t$v0, 1\nmove\t$a0, " + reg1 + "\n" + "syscall\n";
+			}
 	}
 		
 }

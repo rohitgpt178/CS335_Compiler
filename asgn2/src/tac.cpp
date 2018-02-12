@@ -6,6 +6,7 @@ vector <tac> prog;		//the whole ir code
 int n_lines;
 	
 vector <int> leaders;		//block leaders if i is in leaders then prog[i] = leader
+vector <int> label_leaders;
 
 int n_block;
 vector <int> start_block;
@@ -21,11 +22,27 @@ unordered_map <string,string> addrdesc;			//done
 unordered_map <string,string> regdesc;	
 unordered_map <int,int> line_block;
 vector < unordered_map <string,details*>> symtab;		//this denotes entire symtable 		
-list <string> emptyreg = {"$a1","$a2","$a3"/*,"$t1","$t2","$t3","$t4","$t5","$t6","$t7","$t8","$t9","$s1","$s2","$s3","$s4","$s5","$s6","$s7"*/};
+//vector < unordered_map <string,details*>> symtab2;
+list <string> emptyreg = {"$a1"/*,"$a2"/*,"$a3"/*,"$t1","$t2","$t3","$t4","$t5","$t6","$t7","$t8","$t9","$s1","$s2","$s3","$s4","$s5","$s6","$s7"*/};
 
 int label_ret = 0;
 
 string blockcode = "";
+
+void add_emptyreg(string reg){
+	emptyreg.push_back(reg);
+}
+
+bool is_labelleader(int x){
+	bool check = 0;
+	for(int i=0;i<label_leaders.size();i++){
+		if(x==label_leaders[i]){
+			check = 1;
+			break;
+		}	
+	}
+	return check;
+}
 
 void enter_variables(vector < unordered_map <string,details*>> &symtab){		//fills variables in sym_tabs
 	//cout << n_lines << '\t' << n_block << endl;
@@ -43,7 +60,8 @@ void enter_variables(vector < unordered_map <string,details*>> &symtab){		//fill
 					
 					if(symtab[i].find(var_name)==symtab[i].end()){
 						details * var_details = new details();
-						symtab[i].insert(make_pair(var_name, var_details));						
+						symtab[i].insert(make_pair(var_name, var_details));
+						//cout << "inserting into symtab " << i << " var" << var_name << endl;						
 					}
 				}	
 			}
@@ -52,7 +70,8 @@ void enter_variables(vector < unordered_map <string,details*>> &symtab){		//fill
 					string var_name = prog[j-1].in2;
 					if(symtab[i].find(var_name)==symtab[i].end()){
 						details * var_details = new details();
-						symtab[i].insert(make_pair(var_name, var_details));						
+						symtab[i].insert(make_pair(var_name, var_details));
+						//cout << "inserting into symtab "<< i << " var" << var_name << endl;						
 					}
 				}	
 			}
@@ -61,7 +80,8 @@ void enter_variables(vector < unordered_map <string,details*>> &symtab){		//fill
 					string var_name = prog[j-1].out;
 					if(symtab[i].find(var_name)==symtab[i].end()){
 						details * var_details = new details();
-						symtab[i].insert(make_pair(var_name, var_details));						
+						symtab[i].insert(make_pair(var_name, var_details));
+						//cout << "inserting into symtab "<< i << " var" << var_name << endl;						
 					}
 				}	
 			}
@@ -70,7 +90,8 @@ void enter_variables(vector < unordered_map <string,details*>> &symtab){		//fill
 	}
 }
 
-void fill_nextuse( unordered_map <string,details*> symtab,int start_block,int end_block){		
+void fill_nextuse( unordered_map <string,details*> &symtab,int start_block,int end_block){
+	//cout << "filling from " << start_block << " to " << end_block << endl;		
 	//for one block only
 	for(int i=end_block;i>=start_block;i--){	//i = line no.
 		//copying from symtab to updates[i-1]	//for line i
@@ -183,7 +204,8 @@ string getReg(string var,tac instr,vector < unordered_map <string,details*>> &sy
 			reg = getlocation(y);
 			blockcode = blockcode + "sw\t" + reg + ", " + y + "\n";
 			//update everything for variable y
-			addrdesc[y] = "mem";
+			setlocation(y,"mem");	//addrdesc[y] = "mem";
+			
 			
 		}
 		else if(emptyreg.size()>0){
@@ -207,7 +229,7 @@ string getReg(string var,tac instr,vector < unordered_map <string,details*>> &sy
 			reg = getlocation(var_maxnextuse);
 			//update everything for variable var_maxnextuse;
 			blockcode = blockcode + "sw\t" + reg + ", " + var_maxnextuse + "\n";
-			addrdesc[var_maxnextuse] = "mem";
+			setlocation(var_maxnextuse,"mem");//addrdesc[var_maxnextuse] = "mem";
 			//return reg;
 		}
 		/*else{
@@ -225,9 +247,13 @@ string getReg(string var,tac instr,vector < unordered_map <string,details*>> &sy
 			int max_nextuse = 0;
 			string var_maxnextuse = "";
 			for(itr = symtab[block_no].begin(); itr != symtab[block_no].end(); itr++){
-				if(check_reg(addrdesc[itr->first])==true){
+			//cout << "checking at line "<< instr.lineno  << "for variable " << var << "::" << itr->first << "with nextuse "<< itr->second->nextuse << "\n";
+			//print_symtab(symtab,line_block[instr.lineno]);
+				if(var!= itr->first && check_reg(addrdesc[itr->first])==true){
+					//cout << "check for :" <<  itr->first<< "\n";
 					if(itr->second->nextuse >= max_nextuse){
 						max_nextuse = itr->second->nextuse;
+						//cout << "cross check for :" <<  itr->first << endl;
 						var_maxnextuse = itr->first;
 					}
 				}
@@ -237,12 +263,27 @@ string getReg(string var,tac instr,vector < unordered_map <string,details*>> &sy
 			reg = getlocation(var_maxnextuse);
 			//update everything for variable var_maxnextuse;
 			blockcode = blockcode + "sw\t" + reg + ", " + var_maxnextuse + "\n";
-			addrdesc[var_maxnextuse] = "mem";
+			setlocation(var_maxnextuse,"mem");//addrdesc[var_maxnextuse] = "mem";
 		}
 	}
 	//cout << "GOT rg for " << var << "---------" << reg << endl;
 	
 	return reg;
+}
+
+void conserve_block(){
+	for (itr2 = addrdesc.begin(); itr2 != addrdesc.end(); itr2++)
+	    	{
+			//cout << itr2->first << "\t" << itr2->second << endl;
+			if(check_reg(itr2->second)==1){
+			string reg_old = itr2->second;	
+			string variable = itr2->first;
+			blockcode = blockcode + "sw\t" + reg_old + ", " +  variable + "\n";
+			add_emptyreg(reg_old);
+			setlocation(variable,"mem");
+			setregister(reg_old,"");		
+		}
+	}
 }
 
 int main(int argc, char **argv){
@@ -293,7 +334,7 @@ int main(int argc, char **argv){
 				else if(token=="label"){
 					ins_temp.type = "label";
 				}
-				else if(token=="ret"){					//name it exit
+				else if(token=="exit"){					//name it exit
 					ins_temp.type = "return1";					//no further tokens
 				}
 				else if(token=="return"){
@@ -301,6 +342,10 @@ int main(int argc, char **argv){
 				}
 				else if(token=="print"){
 					ins_temp.type = "print";
+				}
+				//getreturn
+				else if(token=="getreturn"){
+					ins_temp.type = "getreturn";
 				}
 				//label??
 			}
@@ -339,6 +384,10 @@ int main(int argc, char **argv){
 				else if(ins_temp.type == "print"){
 					if(i==3)ins_temp.in1 = token;
 				}
+				//getreturn
+				else if(ins_temp.type == "getreturn"){
+					if(i==3)ins_temp.in1 = token;
+				}
 			}
 			i++;
 		}
@@ -347,10 +396,16 @@ int main(int argc, char **argv){
 			//printf("HERE\n");
 			is_prev = 0;
 		}
-		if(ins_temp.type == "ifgoto" || ins_temp.type == "goto"){			//checl for label is block or not??
-			leaders.push_back(ins_temp.target);
-			//printf("HERE\n");
-			is_prev = 1;
+		if(ins_temp.type == "ifgoto" || ins_temp.type == "goto" || ins_temp.type == "label"){	//checl for label is block or not??
+			if(ins_temp.type == "ifgoto" || ins_temp.type == "goto"){
+				leaders.push_back(ins_temp.target);
+				//printf("HERE\n");
+				is_prev = 1;
+			}
+			else{
+				label_leaders.push_back(ins_temp.lineno);
+				leaders.push_back(ins_temp.lineno);	//lineno for label defined
+			}	
 		}	
 		prog.push_back(ins_temp);
 		//printf("\n");		
@@ -358,13 +413,27 @@ int main(int argc, char **argv){
 	
 	n_lines = prog.size();
 	sort(leaders.begin(),leaders.end());			//blocks in order- check for uniqeness?
+	leaders.erase( unique( leaders.begin(), leaders.end() ), leaders.end() );
+	
+	//printing leaders
+	/*for(int i=0;i<leaders.size();i++){
+		cout << leaders[i] << "\t";
+	}
+	cout << "\n";
+	for(int i=0;i<label_leaders.size();i++){
+		cout << label_leaders[i] << "\t";
+	}
+	cout << "\n";*/
+	
 	n_block = leaders.size();
 	start_block = leaders;
 	for(int i=0;i<leaders.size()-1;i++){
 		end_block.push_back(leaders[i+1]-1);
 	}
 	end_block.push_back(n_lines);
-	
+	/*for(int i=0;i<leaders.size();i++){
+		cout << start_block[i] << end_block[i] << "HERE\n";
+	}*/	
 	//filling mapping between lines to blocks
 	for(int i=0;i<n_block;i++){
 		for(int j=start_block[i];j<=end_block[i];j++){
@@ -383,6 +452,7 @@ int main(int argc, char **argv){
 	//symbol table
 	//unordered_map <string,details*> symtab[n_block];		//this denotes entire symtable 
 	symtab.resize(n_block);
+	//symtab2.resize(n_block);
 	
 	/*
 	//<testing>
@@ -404,6 +474,8 @@ int main(int argc, char **argv){
      	//</testing>
 	*/
 	enter_variables(symtab);
+	//enter_variables(symtab2);
+	//cout << "entered variables\n";
 	fill_addrdesc(symtab,n_block);
 	//<testing>
 	/*for (itr = symtab[1].begin(); itr != symtab[1].end(); itr++)
@@ -449,6 +521,7 @@ int main(int argc, char **argv){
      	
      	/*cout << "-----------updates------------" << endl;
      	for(int j=0;j<updates.size();j++){
+     		cout << "updates  before line " << j << endl;
 	     	for(int i=0;i<updates[j].size();i++){
 	     		cout << j+1 << " : " << get<0>(updates[j][i]) << '\t' << get<1>(updates[j][i]) << '\t' << get<2>(updates[j][i]) << endl;
 	     	}
@@ -478,26 +551,44 @@ int main(int argc, char **argv){
 	//.main
 	
 	for(int i=0;i<n_block;i++){
+		int is_conserved = 0;
 		//cout << "CODE FOR BLOCK " << i << "\n";
-		blockcode = "l" + to_string(leaders[i]) + ":\n";
+		//cout << i << "\t" << is_labelleader(i) << endl;
+		if(is_labelleader(leaders[i])!=true){
+			blockcode = "l" + to_string(leaders[i]) + ":\n";
+		}
+		else{
+			blockcode = "";
+		}
 		for(int index = start_block[i];index<=end_block[i];index++){	//index is lineno -> prog[index-1] is the code
-			update_symtab(symtab,updates,index);
+			//update_symtab(symtab,updates,index);
+			if(prog[index-1].type=="ifgoto"||prog[index-1].type=="goto"||prog[index-1].type=="return1"){
+				conserve_block();
+				is_conserved = 1;
+			}
 			codegen(prog[index-1],blockcode);
+			update_symtab(symtab,updates,index);
 		}
 		//todo : store all variables back in memory and update regdesc,addrdesc.
+		if(is_conserved==0){
+			conserve_block();
+		}	
 		cout << blockcode;
-		for (itr2 = addrdesc.begin(); itr2 != addrdesc.end(); itr2++)
+		/*for (itr2 = addrdesc.begin(); itr2 != addrdesc.end(); itr2++)
 	    	{
 			//cout << itr2->first << "\t" << itr2->second << endl;
 			if(check_reg(itr2->second)==1){
 				string reg_old = itr2->second;
 				string variable = itr2->first;
 				cout << "sw\t" << reg_old << ", " <<  variable << "\n";
+				add_emptyreg(reg_old);
 				setlocation(variable,"mem");
 				setregister(reg_old,"");
 				
 			}
-	     	}
+	     	}*/
+	     	//conserve_block();
 	}
+
 	return 0;
 }

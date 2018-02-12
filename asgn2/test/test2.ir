@@ -1,0 +1,15 @@
+1,=,a,2
+2,=,B,7
+3,/,a,B,2
+4,goto,5
+5,call,foo
+6,getreturn,B
+7,+,B,a,5
+8,print,B
+9,exit
+10,label,foo
+11,*,a,a,100
+12,+,B,a,5
+13,print,a
+14,return,B
+15,exit

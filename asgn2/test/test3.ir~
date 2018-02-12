@@ -1,0 +1,10 @@
+1,=,a,5
+2,=,B,3
+3,*,a,B,5
+4,ifgoto,geq,a,10,6
+5,call,foo
+6,print,a
+7,exit
+8,label,foo
+9,=,a,10
+10,exit

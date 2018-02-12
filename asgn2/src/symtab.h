@@ -12,6 +12,8 @@ typedef struct details{
 //extern unordered_map <string,details*> symtab[];
 extern vector < unordered_map <string,details*>> symtab;
 
+//extern vector < unordered_map <string,details*>> symtab2;
+
 extern unordered_map <string,string> addrdesc;
 extern unordered_map <string,string> regdesc;	//for now
 extern unordered_map <int,int> line_block;
