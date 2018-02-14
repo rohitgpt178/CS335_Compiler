@@ -23,7 +23,7 @@ unordered_map <string,string> regdesc;
 unordered_map <int,int> line_block;
 vector < unordered_map <string,details*>> symtab;		//this denotes entire symtable 		
 //vector < unordered_map <string,details*>> symtab2;
-list <string> emptyreg = {"$a1"/*,"$a2"/*,"$a3"/*,"$t1","$t2","$t3","$t4","$t5","$t6","$t7","$t8","$t9","$s1","$s2","$s3","$s4","$s5","$s6","$s7"*/};
+list <string> emptyreg = {"$a1","$a2","$a3","$t1","$t2","$t3","$t4","$t5","$t6","$t7","$t8","$t9","$s1","$s2","$s3","$s4","$s5","$s6","$s7"};
 
 int label_ret = 0;
 
@@ -396,15 +396,18 @@ int main(int argc, char **argv){
 			//printf("HERE\n");
 			is_prev = 0;
 		}
-		if(ins_temp.type == "ifgoto" || ins_temp.type == "goto" || ins_temp.type == "label"){	//checl for label is block or not??
+		if(ins_temp.type == "ifgoto" || ins_temp.type == "goto" || ins_temp.type == "label" || ins_temp.type == "call"){	//checl for label is block or not??
 			if(ins_temp.type == "ifgoto" || ins_temp.type == "goto"){
 				leaders.push_back(ins_temp.target);
 				//printf("HERE\n");
 				is_prev = 1;
 			}
-			else{
+			else if(ins_temp.type == "label"){
 				label_leaders.push_back(ins_temp.lineno);
 				leaders.push_back(ins_temp.lineno);	//lineno for label defined
+			}
+			else{
+				leaders.push_back(ins_temp.lineno);
 			}	
 		}	
 		prog.push_back(ins_temp);
@@ -562,11 +565,13 @@ int main(int argc, char **argv){
 		}
 		for(int index = start_block[i];index<=end_block[i];index++){	//index is lineno -> prog[index-1] is the code
 			//update_symtab(symtab,updates,index);
+			//cout << "at index : " << index << endl;
 			if(prog[index-1].type=="ifgoto"||prog[index-1].type=="goto"||prog[index-1].type=="return1"){
 				conserve_block();
 				is_conserved = 1;
 			}
 			codegen(prog[index-1],blockcode);
+			//print_symtab(symtab,n_block);
 			update_symtab(symtab,updates,index);
 		}
 		//todo : store all variables back in memory and update regdesc,addrdesc.
