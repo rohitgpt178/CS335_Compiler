@@ -286,6 +286,21 @@ void conserve_block(){
 	}
 }
 
+void init_block(){
+	for (itr2 = addrdesc.begin(); itr2 != addrdesc.end(); itr2++)
+	    	{
+			//cout << itr2->first << "\t" << itr2->second << endl;
+			if(check_reg(itr2->second)==1){
+			string reg_old = itr2->second;	
+			string variable = itr2->first;
+			//blockcode = blockcode + "sw\t" + reg_old + ", " +  variable + "\n";
+			add_emptyreg(reg_old);
+			setlocation(variable,"mem");
+			setregister(reg_old,"");		
+		}
+	}
+}
+
 int main(int argc, char **argv){
 
 	leaders.push_back(1);
@@ -554,6 +569,7 @@ int main(int argc, char **argv){
 	//.main
 	
 	for(int i=0;i<n_block;i++){
+		init_block();	//starting block
 		int is_conserved = 0;
 		//cout << "CODE FOR BLOCK " << i << "\n";
 		//cout << i << "\t" << is_labelleader(i) << endl;

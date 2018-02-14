@@ -29,7 +29,6 @@ sw	$t1, ans
 lw	$t3, a
 bne	$t3, 1, l3
 l10:
-sw	$t3, a
 lw 	$t0, 0($sp)
 addi 	$sp,$sp,4
 jr 	$ra

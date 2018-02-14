@@ -5,29 +5,27 @@ B:	.word	0
 main:
 l1:
 li	$a1, 5
+li	$a2, 3
+mul	$a1, $a2, 5
 sw	$a1, a
-li	$a1, 3
-sw	$a1, B
-mul	$a1, $a1, 5
-sw	$a1, a
-lw	$a1, a
-ble	$a1, 10, l6
+sw	$a2, B
+lw	$a3, a
+ble	$a3, 10, l6
 l5:
 jal	foo
-sw	$a1, a
 l6:
-lw	$a1, a
+lw	$t1, a
 li	$v0, 1
-move	$a0, $a1
+move	$a0, $t1
 syscall
-sw	$a1, a
+sw	$t1, a
 li 	$v0, 10
 syscall
 foo:
 	addi	$sp,$sp,-4
 	sw	$t0, 0($sp)
-li	$a1, 10
-sw	$a1, a
+li	$t2, 10
+sw	$t2, a
 lw 	$t0, 0($sp)
 addi 	$sp,$sp,4
 jr 	$ra

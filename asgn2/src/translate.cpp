@@ -213,6 +213,7 @@ void codegen(tac instr,string &blockcode){
 						blockcode = blockcode + "lw\t" + reg2 + ", " + instr.in1 +"\n"; 
 						blockcode = blockcode+ "ble\t" + reg2 + ", " + instr.in2 + ", " + "l" + to_string(instr.target) + "\n";
 						setregister(reg2, instr.in1);
+						//cout << "HERE\n";
 				        	setlocation(instr.in1, reg2);
 					}
 					

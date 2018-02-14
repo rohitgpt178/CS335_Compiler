@@ -66,6 +66,8 @@ void add_emptyreg(string reg);
 
 void conserve_block();
 
+void init_block();
+
 extern int label_ret;
 
 //code gen function
