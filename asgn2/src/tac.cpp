@@ -23,6 +23,7 @@ unordered_map <string,string> regdesc;
 unordered_map <int,int> line_block;
 vector < unordered_map <string,details*>> symtab;		//this denotes entire symtable 		
 //vector < unordered_map <string,details*>> symtab2;
+
 list <string> emptyreg = {"$a1","$a2","$a3","$t1","$t2","$t3","$t4","$t5","$t6","$t7","$t8","$t9","$s1","$s2","$s3","$s4","$s5","$s6","$s7"};
 
 int label_ret = 0;
