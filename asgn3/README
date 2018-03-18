@@ -1,0 +1,17 @@
+CS335 : Compiler Design 2017-18/II
+
+Group 47
+
+PARSER - Go-cpp-mips compiler
+
+check-----
+1. method for structs and their calling (DONE)
+2. defining structs in main and their fields and methods (DONE)
+3. index check array (DONE)
+4. declaring array at once - a = {3,6,7} (NOT IMPLEMENTED FOR NOW - maybe)
+5. switch-case not working (TO REMOVE IMPLEMENTATION)
+
+NOTE:
+1. Every block except the last ends with "};".
+2. If a block is empty, it still has a ';'.
+3. Variable declartions are using "var" in block and fields declarations are direct in struct.
