@@ -449,12 +449,12 @@ Expression:
     ;
 
 Expression1:
-    Expression1 OR Expression2 {lhs.push_back("Expression1");rhs.push_back("Expression1 OR Expression2");}//{cout << "expr21";}
+    Expression1 LOR Expression2 {lhs.push_back("Expression1");rhs.push_back("Expression1 LOR Expression2");}//{cout << "expr21";}
     | Expression2 {lhs.push_back("Expression1");rhs.push_back("Expression2");}//{cout << "expr22";}
     ;
 
 Expression2:
-    Expression2 AND Expression3 {lhs.push_back("Expression2");rhs.push_back("Expression2 AND Expression3");}//{cout << "expr31";}
+    Expression2 LAND Expression3 {lhs.push_back("Expression2");rhs.push_back("Expression2 LAND Expression3");}//{cout << "expr31";}
     | Expression3 {lhs.push_back("Expression2");rhs.push_back("Expression3");}//{cout << "expr32";}
     ;
 
