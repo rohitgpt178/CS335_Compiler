@@ -24,6 +24,7 @@ func (r *rect) area() int {
 func main( ) {
     Println(s);
     foo();
+    a := foo(b,c);
     const n int ;
     var fgh int;
     const d int = 320 + 3 + 4 * 3 - a*5/3 ;

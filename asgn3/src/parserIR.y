@@ -162,10 +162,12 @@ FunctionBody:
 //function call starts here
 FunctionStmt:
 		VarDecl DEFINE FunctionCall{lhs.push_back("FunctionStmt");rhs.push_back("VarDecl DEFINE FunctionCall");}
+		//new changes
+		| IDENTIFIER DEFINE FunctionCall{lhs.push_back("FunctionStmt");rhs.push_back("IDENTIFIER DEFINE FunctionCall");}
 		;
 
 
-FunctionCall:	PrimaryExpr LPAREN ArgumentList RPAREN {lhs.push_back("FunctionCall");rhs.push_back("QualifiedIdent PackageName PERIOD IDENTIFIER");}
+FunctionCall:	PrimaryExpr LPAREN ArgumentList RPAREN {lhs.push_back("FunctionCall");rhs.push_back("PrimaryExpr LPAREN ArgumentList RPAREN");}
 		;		
 
 ArgumentList:	
