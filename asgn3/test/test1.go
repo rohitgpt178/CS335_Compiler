@@ -1,22 +1,24 @@
 package main;
-
 import "fmt";
-
 func main() {
-	var a [5]int;
-	fmt.Println("emp:", a);
-	//a[4] = 100;
-	fmt.Println("set:", a);
-	//fmt.Println("get:", a[4]);
-	fmt.Println("len:", len(a));
-	//b = [5]int{1, 2, 3, 4, 5};
-	fmt.Println("dcl:", b);
-	var twoD ;//[2][3]int; 
-	for i := 0; i < 2; i++ {
-		for j := 0; j < 3; j++ {
-			;//twoD[i][j] = i + j;
-		};
-	};
-	fmt.Println("2d: ", twoD);
-	fmt.Println("bye");
+
+    if (7%2 == 0){
+        fmt.Println("7 is even");
+    }else {
+        fmt.Println("7 is odd");
+    };
+
+    if (8%4 == 0) {
+        fmt.Println("8 is divisible by 4");
+    } ;
+
+   var num int = 45;
+    if (num < 0) {
+        fmt.Println(num, "is negative");
+    } else if (num < 10) {
+        fmt.Println(num, "has 1 digit");
+    } else {
+        fmt.Println(num, "has multiple digits");
+    };
+
 }

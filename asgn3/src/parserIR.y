@@ -529,6 +529,7 @@ assign_op:
 	| MUL_ASSIGN {lhs.push_back("assign_op");rhs.push_back("MUL_ASSIGN");}
 	| QUO_ASSIGN {lhs.push_back("assign_op");rhs.push_back("QUO_ASSIGN");}
 	| REM_ASSIGN {lhs.push_back("assign_op");rhs.push_back("REM_ASSIGN");}
+	//| DEFINE 
 	;
 /*IfStmt shift/reduce conflict*/
 

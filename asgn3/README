@@ -15,3 +15,5 @@ NOTE:
 1. Every block except the last ends with "};".
 2. If a block is empty, it still has a ';'.
 3. Variable declartions are using "var" in block and fields declarations are direct in struct.
+4. struct does not use define :=
+5. define is used for a := f(b,c) (function and struct -> opposite)
