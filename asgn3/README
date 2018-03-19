@@ -12,7 +12,7 @@ Firstly we wrote LALR grammer of GoLang in parserIR.y using lexemes in lexer.l a
 Then we used html.cpp, which creates a html file for the given program input. By running parserIR.y in bison parserIR.tab.h is created
 and lexer.l through flex, lex.yy.c is created.
 
-Now running html.cpp parserIR.tab.h lex.yy.c together an executable 'parser' is created which given a GoLang program creates an html file.
+Now running html.cpp parserIR.tab.h lex.yy.c together an executable 'parserIR' is created in bin which given a GoLang program creates an html file.
 
 Run the PARSER using following commands
 
