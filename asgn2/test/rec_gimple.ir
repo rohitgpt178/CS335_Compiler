@@ -1,0 +1,14 @@
+1,=,g,4
+2,call,myfunc
+3,exit
+4,label,myfunc
+5,=,g0,g
+6,ifgoto,neq,g0,0,8
+7,exit
+8,=,g1,g
+9,print,g1
+10,=,g2,g
+11,-,g3,g2,1
+12,=,g,g3
+13,call,myfunc
+14,exit

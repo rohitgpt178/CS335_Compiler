@@ -1,0 +1,16 @@
+1,=,f,1
+2,=,sum,0
+3,=,i,0
+4,goto,13
+5,%,D_1732,f,10
+6,ifgoto,eq,D_1732,0,8
+7,ifgoto,neq,D_1732,0,10
+8,print,f
+9,goto,11
+10,+,sum,sum,i
+11,+,i,i,1
+12,*,f,i,2
+13,ifgoto,leq,i,99,5
+14,ifgoto,ge,i,99,15
+15,print,sum
+16,exit

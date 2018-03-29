@@ -406,10 +406,16 @@ string_lit:
 	STRING {lhs.push_back("string_lit");rhs.push_back("STRING");}
 	;
 
+//added later
+byte_lit:
+	BYTE {lhs.push_back("byte_lit");rhs.push_back("BYTE");}
+	;
+	
 BasicLit:
 	int_lit {lhs.push_back("BasicLit");rhs.push_back("int_lit");}
 	| float_lit {lhs.push_back("BasicLit");rhs.push_back("float_lit");}
 	| string_lit {lhs.push_back("BasicLit");rhs.push_back("string_lit");}
+	| byte_lit {lhs.push_back("BasicLit");rhs.push_back("byte_lit");}	//added later
 	;
 
 
