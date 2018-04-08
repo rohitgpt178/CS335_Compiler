@@ -27,4 +27,3 @@ NOTE:
 3. Variable declartions are using "var" in block and fields declarations are direct in struct.
 4. Struct Declaration does not use define ":=".
 5. Define is used for following assignment, a := f(b,c).
-6. Post statement in for loop can't end with variable - soln: end with +0

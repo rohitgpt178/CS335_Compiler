@@ -1,0 +1,27 @@
+CS335 : Compiler Design 2017-18/II
+
+Group 47
+
+Assignment - 4
+
+3AC generator for the following tuple:
+
+Source Language : GOLANG
+Implementation Language : C++
+Target Language: MIPS
+
+In this assignment,we have implemented code which generates 3ac code from golang files. We have used emit based translation which means the translation occurs alongside parsing of input file. 
+
+Along with the translation, we have implemented a symbol table which contains the variables and checks their scopes. The symbol table is implemented as a tree-like structure in which each node contains a pointer to parent node and a mapping of the variables in that scope to their entries (only types for now). 
+
+Whenever a variable(or function) is declared, it is inserted in the symbol table of the present scope. Whenever a undeclared or out of scope variable(or function) is encountered, it outputs error.
+
+The translated 3ac code is displayed on stdout.
+
+Instructions to run:
+
+– cd asgn4
+– make
+– bin/irgen test/test1.go
+
+ 
