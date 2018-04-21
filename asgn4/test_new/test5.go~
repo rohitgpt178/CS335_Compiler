@@ -1,7 +1,7 @@
 package main;
 import "fmt";
 func main() {
-	//var c,d,e int;
+	var c,d,e int;
 	if(c && d){
 		d++;
 	}	
