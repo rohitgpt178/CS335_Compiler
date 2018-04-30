@@ -8,4 +8,4 @@
 * [AMIGO](https://github.com/HexFlow/amigo)
 * [divush/csharp-compiler](https://github.com/divush/csharp-compiler)
 
-**NOTE** : final project in final_compiler
+**NOTE** : final project in compiler_final
